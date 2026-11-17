@@ -1,6 +1,10 @@
 # E2E Test Core
 
 [![Tests](https://github.com/piotrwaligora/e2e-test-core/actions/workflows/tests.yml/badge.svg)](https://github.com/piotrwaligora/e2e-test-core/actions/workflows/tests.yml)
+[![Allure Report](https://img.shields.io/badge/Allure-report-orange)](https://piotrwaligora.github.io/e2e-test-core/)
+
+- **CI pipeline:** [GitHub Actions runs](https://github.com/piotrwaligora/e2e-test-core/actions/workflows/tests.yml)
+- **Latest test report:** [Allure report on GitHub Pages](https://piotrwaligora.github.io/e2e-test-core/) (updated on every push to `main`)
 
 API and UI test automation framework in Java. It shows a layered test architecture,
 design patterns, BDD, reporting and CI on a real application:
@@ -203,9 +207,10 @@ The [GitHub Actions workflow](.github/workflows/tests.yml) runs on every push an
 2. runs all tests in headless Chrome with one retry (the tested application is a public demo app)
 3. generates the Allure report, also when tests fail
 4. uploads artifacts: `allure-report`, `allure-results`, `screenshots` and `surefire-reports`
+5. on `main`, publishes the Allure report to [GitHub Pages](https://piotrwaligora.github.io/e2e-test-core/), also when tests fail
 
-Download the `allure-report` artifact from the workflow run and open it with `allure open`
-or any static file server.
+Every run summary links to the latest report. The report of a branch or pull request run
+is available as the `allure-report` artifact.
 
 ## Test data
 
