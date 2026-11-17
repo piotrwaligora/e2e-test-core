@@ -6,12 +6,24 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Creates WebDriver instances based on configuration.
  * Driver binaries are resolved by Selenium Manager.
  */
 public final class DriverFactory {
+
+    /*
+     * The framework does not use Chrome DevTools Protocol, so the warning about a newer
+     * Chrome CDP version than Selenium supports is noise. A strong reference keeps the level.
+     */
+    private static final Logger CDP_VERSION_LOGGER = Logger.getLogger("org.openqa.selenium.devtools.CdpVersionFinder");
+
+    static {
+        CDP_VERSION_LOGGER.setLevel(Level.SEVERE);
+    }
 
     private DriverFactory() {
     }

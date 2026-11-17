@@ -91,6 +91,19 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <!-- Keep the console readable: hide JDK 25 Unsafe warnings from third-party libraries -->
+                    <argLine>--sun-misc-unsafe-memory-access=allow</argLine>
+                    <systemPropertyVariables>
+                        <!-- No logging backend is used on purpose; silence the SLF4J "no providers" notice -->
+                        <slf4j.internal.verbosity>ERROR</slf4j.internal.verbosity>
+                    </systemPropertyVariables>
+                    <properties>
+                        <!-- Registered here, not in testng.xml, so that it also works with -Dtest=... -->
+                        <property>
+                            <name>listener</name>
+                            <value>io.github.piotrwaligora.e2e.listeners.TestProgressListener</value>
+                        </property>
+                    </properties>
                 </configuration>
             </plugin>
         </plugins>
