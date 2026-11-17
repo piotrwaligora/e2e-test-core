@@ -5,6 +5,7 @@ import io.github.piotrwaligora.e2e.api.client.Users;
 import io.github.piotrwaligora.e2e.api.model.AuthResponse;
 import io.github.piotrwaligora.e2e.api.model.ContactResponse;
 import io.github.piotrwaligora.e2e.api.model.LoginRequest;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import static org.apache.http.HttpStatus.SC_OK;
@@ -20,6 +21,7 @@ public final class TestDataCleaner {
      * Deletes the user and all of its contacts. Does nothing if the user does not exist.
      * Logs in again because a logout invalidates every token of the user.
      */
+    @Step("Delete test user {email} with contacts via API")
     public static void deleteUser(String email, String password) {
         Response login = new Users().login(new LoginRequest(email, password));
         if (login.statusCode() == SC_UNAUTHORIZED) {

@@ -38,6 +38,10 @@ public final class TestConfig {
         return Duration.ofMillis(Long.parseLong(get("ui.polling.millis")));
     }
 
+    public static int retryCount() {
+        return Integer.parseInt(get("retry.count"));
+    }
+
     public static String get(String key) {
         String value = System.getProperty(key, PROPERTIES.getProperty(key));
         if (value == null || value.isBlank()) {

@@ -70,6 +70,13 @@ public class TestProgressListener implements ITestListener, IDataProviderInterce
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        if (result.wasRetried()) {
+            // The failed attempt is reported as skipped; the retry reuses the same position.
+            counters.get(result.getTestContext().getName()).decrementAndGet();
+            log("%s RETRY   %s (%s): %s", result.getAttribute(INDEX), testName(result), duration(result),
+                    shortReason(result.getThrowable()));
+            return;
+        }
         log("%s SKIPPED %s", result.getAttribute(INDEX), testName(result));
     }
 

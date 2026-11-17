@@ -5,6 +5,7 @@ import io.github.piotrwaligora.e2e.api.model.ContactResponse;
 import io.github.piotrwaligora.e2e.data.TestDataFactory;
 import io.github.piotrwaligora.e2e.ui.pages.ContactDetailsPage;
 import io.github.piotrwaligora.e2e.ui.pages.ContactListPage;
+import io.qameta.allure.Step;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -38,12 +39,14 @@ public class ContactE2ETest extends BaseUiTest {
 
     // ---------- Verifications ----------
 
+    @Step("Verify contact is listed in the UI")
     private void verifyContactIsListed(ContactListPage contactList, ContactRequest contact) {
         assertThat(contactList.getContactRowText(contact.fullName()))
                 .as("contact list row")
                 .contains(contact.email(), contact.phone(), contact.country());
     }
 
+    @Step("Verify contact is stored in the API")
     private void verifyContactIsStoredInApi(ContactRequest expected) {
         List<ContactResponse> stored = getAllContactsViaApi();
         assertThat(stored).as("contacts stored in the API").hasSize(1);

@@ -12,7 +12,7 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(
         features = "classpath:features",
         glue = "io.github.piotrwaligora.e2e.bdd",
-        plugin = "summary",
+        plugin = {"summary", "io.qameta.allure.cucumber8jvm.AllureCucumber8Jvm"},
         monochrome = true)
 public class CucumberTestRunner extends AbstractTestNGCucumberTests {
 }
