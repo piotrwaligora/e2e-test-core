@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="E2E Test Core">
+    <test name="Smoke">
+        <packages>
+            <package name="io.github.piotrwaligora.e2e.smoke"/>
+        </packages>
+    </test>
+</suite>
