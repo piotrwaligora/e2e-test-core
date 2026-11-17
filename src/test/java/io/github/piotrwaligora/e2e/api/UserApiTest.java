@@ -4,6 +4,7 @@ import io.github.piotrwaligora.e2e.api.client.Users;
 import io.github.piotrwaligora.e2e.api.model.AuthResponse;
 import io.github.piotrwaligora.e2e.api.model.LoginRequest;
 import io.github.piotrwaligora.e2e.api.model.UserResponse;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.Test;
@@ -59,26 +60,31 @@ public class UserApiTest extends BaseApiTest {
 
     // ---------- Steps ----------
 
+    @Step("Get user profile via API")
     private UserResponse getProfileViaApi() {
         Response response = users.getProfile();
         verifyStatus(response, SC_OK);
         return response.as(UserResponse.class);
     }
 
+    @Step("Log in via API")
     private Response loginViaApi(String password) {
         return new Users().login(new LoginRequest(user.email(), password));
     }
 
+    @Step("Log out via API")
     private void logoutViaApi() {
         verifyStatus(users.logout(), SC_OK);
     }
 
+    @Step("Delete current user via API")
     private void deleteCurrentUserViaApi() {
         verifyStatus(users.deleteCurrentUser(), SC_OK);
     }
 
     // ---------- Verifications ----------
 
+    @Step("Verify profile of the registered user")
     private void verifyProfileOfRegisteredUser(UserResponse profile) {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(profile.id()).as("id").isEqualTo(auth.user().id());
@@ -88,6 +94,7 @@ public class UserApiTest extends BaseApiTest {
         });
     }
 
+    @Step("Verify user is logged in")
     private void verifyLoggedInAsRegisteredUser(Response response) {
         verifyStatus(response, SC_OK);
         AuthResponse login = response.as(AuthResponse.class);
@@ -95,10 +102,12 @@ public class UserApiTest extends BaseApiTest {
         assertThat(login.user().id()).as("logged in user id").isEqualTo(auth.user().id());
     }
 
+    @Step("Verify token is rejected")
     private void verifyTokenIsRejected() {
         verifyStatus(users.getProfile(), SC_UNAUTHORIZED);
     }
 
+    @Step("Verify user cannot log in")
     private void verifyUserCannotLogIn() {
         verifyStatus(loginViaApi(user.password()), SC_UNAUTHORIZED);
     }

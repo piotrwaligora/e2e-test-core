@@ -1,5 +1,6 @@
 package io.github.piotrwaligora.e2e.ui.pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -24,16 +25,19 @@ public class ContactListPage extends BasePage {
         return this;
     }
 
+    @Step("Click Add a New Contact")
     public AddContactPage clickAddContact() {
         actions.clickOn(ADD_CONTACT);
         return new AddContactPage(driver).waitUntilLoaded();
     }
 
     /** Waits for the contact row and returns its visible text. */
+    @Step("Read contact list row of {fullName}")
     public String getContactRowText(String fullName) {
         return actions.getText(contactRow(fullName));
     }
 
+    @Step("Open contact details of {fullName}")
     public ContactDetailsPage openContact(String fullName) {
         actions.clickOn(contactRow(fullName));
         return new ContactDetailsPage(driver).waitUntilLoaded();

@@ -8,6 +8,7 @@ import io.github.piotrwaligora.e2e.api.model.ContactResponse;
 import io.github.piotrwaligora.e2e.api.model.UserRequest;
 import io.github.piotrwaligora.e2e.data.TestDataCleaner;
 import io.github.piotrwaligora.e2e.data.TestDataFactory;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.AfterMethod;
@@ -54,18 +55,21 @@ public abstract class BaseApiTest {
         return createContactViaApi(TestDataFactory.newContact());
     }
 
+    @Step("Create contact via API")
     protected ContactResponse createContactViaApi(ContactRequest contact) {
         Response response = contacts.create(contact);
         verifyStatus(response, SC_CREATED);
         return response.as(ContactResponse.class);
     }
 
+    @Step("Get contact {id} via API")
     protected ContactResponse getContactViaApi(String id) {
         Response response = contacts.getById(id);
         verifyStatus(response, SC_OK);
         return response.as(ContactResponse.class);
     }
 
+    @Step("Get all contacts via API")
     protected List<ContactResponse> getAllContactsViaApi() {
         Response response = contacts.getAll();
         verifyStatus(response, SC_OK);
@@ -74,12 +78,14 @@ public abstract class BaseApiTest {
 
     // ---------- Verifications ----------
 
+    @Step("Verify HTTP status is {expectedStatus}")
     protected void verifyStatus(Response response, int expectedStatus) {
         assertThat(response.statusCode())
                 .as("HTTP status, response body: %s", response.asString())
                 .isEqualTo(expectedStatus);
     }
 
+    @Step("Verify contact data")
     protected void verifyContactData(ContactRequest actual, ContactRequest expected) {
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(actual.firstName()).as("first name").isEqualTo(expected.firstName());
@@ -96,6 +102,7 @@ public abstract class BaseApiTest {
         });
     }
 
+    @Step("Verify contact belongs to the current user")
     protected void verifyContactBelongsToCurrentUser(ContactResponse contact) {
         assertThat(contact.owner()).as("contact owner").isEqualTo(auth.user().id());
     }

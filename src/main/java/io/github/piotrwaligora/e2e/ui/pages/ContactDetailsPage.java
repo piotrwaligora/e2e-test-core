@@ -1,6 +1,7 @@
 package io.github.piotrwaligora.e2e.ui.pages;
 
 import io.github.piotrwaligora.e2e.api.model.ContactRequest;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -31,6 +32,7 @@ public class ContactDetailsPage extends BasePage {
         return this;
     }
 
+    @Step("Read contact details")
     public ContactRequest getContact() {
         return new ContactRequest(
                 actions.getText(FIRST_NAME),

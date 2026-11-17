@@ -1,6 +1,7 @@
 package io.github.piotrwaligora.e2e.ui.pages;
 
 import io.github.piotrwaligora.e2e.api.model.ContactRequest;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -31,6 +32,7 @@ public class AddContactPage extends BasePage {
         return this;
     }
 
+    @Step("Fill in and submit the Add Contact form")
     public ContactListPage addContact(ContactRequest contact) {
         actions.type(FIRST_NAME, contact.firstName());
         actions.type(LAST_NAME, contact.lastName());
