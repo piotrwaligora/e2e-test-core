@@ -5,6 +5,11 @@
             <package name="io.github.piotrwaligora.e2e.api"/>
         </packages>
     </test>
+    <test name="UI">
+        <packages>
+            <package name="io.github.piotrwaligora.e2e.ui"/>
+        </packages>
+    </test>
     <test name="BDD">
         <classes>
             <class name="io.github.piotrwaligora.e2e.bdd.runners.CucumberTestRunner"/>

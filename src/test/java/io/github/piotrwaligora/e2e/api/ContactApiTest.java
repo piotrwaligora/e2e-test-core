@@ -4,19 +4,17 @@ import io.github.piotrwaligora.e2e.api.client.Contacts;
 import io.github.piotrwaligora.e2e.api.model.ContactRequest;
 import io.github.piotrwaligora.e2e.api.model.ContactResponse;
 import io.github.piotrwaligora.e2e.data.TestDataFactory;
+import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertEqualsNoOrder;
-import static org.testng.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContactApiTest extends BaseApiTest {
 
@@ -24,88 +22,107 @@ public class ContactApiTest extends BaseApiTest {
     public void shouldCreateContact() {
         ContactRequest contact = TestDataFactory.newContact();
 
-        ContactResponse created = contacts.create(contact)
-                .then().statusCode(SC_CREATED)
-                .extract().as(ContactResponse.class);
+        ContactResponse created = createContactViaApi(contact);
 
-        assertNotNull(created.id());
-        assertEquals(created.owner(), auth.user().id());
-        assertEquals(created.toRequest(), contact);
+        verifyContactBelongsToCurrentUser(created);
+        verifyContactData(created.toRequest(), contact);
     }
 
     @Test(description = "Contact list returns every contact of the user")
     public void shouldListAllContacts() {
-        String firstId = createContact(TestDataFactory.newContact()).id();
-        String secondId = createContact(TestDataFactory.newContact()).id();
+        ContactResponse first = createContactViaApi();
+        ContactResponse second = createContactViaApi();
 
-        List<String> ids = contacts.getAll()
-                .then().statusCode(SC_OK)
-                .extract().jsonPath().getList("_id", String.class);
+        List<ContactResponse> allContacts = getAllContactsViaApi();
 
-        assertEqualsNoOrder(ids, List.of(firstId, secondId));
+        verifyContactsListed(allContacts, first, second);
     }
 
     @Test(description = "Contact can be read by id")
     public void shouldGetContactById() {
-        ContactRequest contact = TestDataFactory.newContact();
-        String id = createContact(contact).id();
+        ContactResponse created = createContactViaApi();
 
-        ContactResponse fetched = fetchContact(id);
+        ContactResponse fetched = getContactViaApi(created.id());
 
-        assertEquals(fetched.id(), id);
-        assertEquals(fetched.toRequest(), contact);
+        verifySameContact(fetched, created);
     }
 
     @Test(description = "PUT replaces all contact fields")
     public void shouldUpdateContactWithPut() {
-        String id = createContact(TestDataFactory.newContact()).id();
+        ContactResponse created = createContactViaApi();
         ContactRequest replacement = TestDataFactory.newContact();
 
-        contacts.update(id, replacement).then().statusCode(SC_OK);
+        updateContactViaApi(created.id(), replacement);
 
-        assertEquals(fetchContact(id).toRequest(), replacement);
+        verifyContactData(getContactViaApi(created.id()).toRequest(), replacement);
     }
 
     @Test(description = "PATCH changes only the submitted fields")
     public void shouldPartiallyUpdateContactWithPatch() {
-        ContactRequest contact = TestDataFactory.newContact();
-        String id = createContact(contact).id();
+        ContactResponse created = createContactViaApi();
 
-        contacts.patch(id, Map.of("firstName", "Anna")).then().statusCode(SC_OK);
+        changeFirstNameViaApi(created.id(), "Anna");
 
-        assertEquals(fetchContact(id).toRequest(), contact.withFirstName("Anna"));
+        verifyContactData(getContactViaApi(created.id()).toRequest(), created.toRequest().withFirstName("Anna"));
     }
 
     @Test(description = "Deleted contact is no longer available")
     public void shouldDeleteContact() {
-        String id = createContact(TestDataFactory.newContact()).id();
+        ContactResponse created = createContactViaApi();
 
-        contacts.delete(id).then().statusCode(SC_OK);
+        deleteContactViaApi(created.id());
 
-        contacts.getById(id).then().statusCode(SC_NOT_FOUND);
+        verifyContactDoesNotExist(created.id());
     }
 
     @Test(description = "Contact without the required last name is rejected")
     public void shouldRejectContactWithoutLastName() {
-        ContactRequest invalid = TestDataFactory.newContact().withLastName(null);
+        ContactRequest withoutLastName = TestDataFactory.newContact().withLastName(null);
 
-        contacts.create(invalid).then().statusCode(SC_BAD_REQUEST);
+        Response response = contacts.create(withoutLastName);
+
+        verifyRequiredFieldError(response, "lastName");
     }
 
     @Test(description = "Contacts cannot be read without a token")
     public void shouldRejectRequestWithoutToken() {
-        new Contacts().getAll().then().statusCode(SC_UNAUTHORIZED);
+        Response response = new Contacts().getAll();
+
+        verifyStatus(response, SC_UNAUTHORIZED);
     }
 
-    private ContactResponse createContact(ContactRequest contact) {
-        return contacts.create(contact)
-                .then().statusCode(SC_CREATED)
-                .extract().as(ContactResponse.class);
+    // ---------- Steps ----------
+
+    private void updateContactViaApi(String id, ContactRequest contact) {
+        verifyStatus(contacts.update(id, contact), SC_OK);
     }
 
-    private ContactResponse fetchContact(String id) {
-        return contacts.getById(id)
-                .then().statusCode(SC_OK)
-                .extract().as(ContactResponse.class);
+    private void changeFirstNameViaApi(String id, String firstName) {
+        verifyStatus(contacts.patch(id, Map.of("firstName", firstName)), SC_OK);
+    }
+
+    private void deleteContactViaApi(String id) {
+        verifyStatus(contacts.delete(id), SC_OK);
+    }
+
+    // ---------- Verifications ----------
+
+    private void verifyContactsListed(List<ContactResponse> actual, ContactResponse... expected) {
+        assertThat(actual).as("contact list").containsExactlyInAnyOrder(expected);
+    }
+
+    private void verifySameContact(ContactResponse actual, ContactResponse expected) {
+        assertThat(actual).as("fetched contact").isEqualTo(expected);
+    }
+
+    private void verifyContactDoesNotExist(String id) {
+        verifyStatus(contacts.getById(id), SC_NOT_FOUND);
+    }
+
+    private void verifyRequiredFieldError(Response response, String field) {
+        verifyStatus(response, SC_BAD_REQUEST);
+        assertThat(response.jsonPath().getString("errors." + field + ".kind"))
+                .as("validation error for %s", field)
+                .isEqualTo("required");
     }
 }

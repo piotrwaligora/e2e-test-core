@@ -16,6 +16,10 @@ public record ContactRequest(
         String postalCode,
         String country) {
 
+    public String fullName() {
+        return firstName + " " + lastName;
+    }
+
     public ContactRequest withFirstName(String newFirstName) {
         return new ContactRequest(newFirstName, lastName, birthdate, email, phone,
                 street1, street2, city, stateProvince, postalCode, country);

@@ -3,6 +3,7 @@ package io.github.piotrwaligora.e2e.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -19,6 +20,22 @@ public final class TestConfig {
 
     public static String baseUrl() {
         return get("base.url");
+    }
+
+    public static String browser() {
+        return get("browser");
+    }
+
+    public static boolean headless() {
+        return Boolean.parseBoolean(get("headless"));
+    }
+
+    public static Duration uiTimeout() {
+        return Duration.ofSeconds(Long.parseLong(get("ui.timeout.seconds")));
+    }
+
+    public static Duration uiPolling() {
+        return Duration.ofMillis(Long.parseLong(get("ui.polling.millis")));
     }
 
     public static String get(String key) {
