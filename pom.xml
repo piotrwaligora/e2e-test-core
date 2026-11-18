@@ -33,6 +33,25 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--
+                Cucumber declares these as version ranges. Pinning them makes builds reproducible
+                and avoids range lookups on Maven Central, which can fail on CI runners.
+            -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>messages</artifactId>
+                <version>35.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>query</artifactId>
+                <version>16.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
+            </dependency>
             <dependency>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-bom</artifactId>
