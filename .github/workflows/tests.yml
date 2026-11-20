@@ -54,7 +54,7 @@ jobs:
           echo "- Report of this run: download the \`allure-report\` artifact below" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload report for GitHub Pages
-        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           path: target/site/allure-maven-plugin
@@ -96,11 +96,11 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  # Publishes the Allure report of the main branch to GitHub Pages, also when tests fail.
+  # Publishes the Allure report of main (merge, schedule or manual run) to GitHub Pages, also when tests fail.
   publish-report:
     name: Publish Allure report
     needs: tests
-    if: always() && needs.tests.result != 'cancelled' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() && needs.tests.result != 'cancelled' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       pages: write
